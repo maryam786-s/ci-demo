@@ -1,6 +1,6 @@
 # tests/test_app.py
 import unittest
-# Import the function you want to test from your app.py file
+# Import function you want to test from your app.py file
 from app import multiply
 
 class TestMyProject(unittest.TestCase):
