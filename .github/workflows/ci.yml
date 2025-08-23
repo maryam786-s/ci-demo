@@ -1,5 +1,57 @@
-import unittest
+name: Python CI/CD Pipeline
 
-class MyTest(unittest.TestCase):
-    def test_my_first_test(self):
-        self.assertEqual(1 + 1, 2)
+on:
+  # Triggers the workflow on push or pull request events to the 'main' branch
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    # Specifies the operating system for the runner environment
+    runs-on: ubuntu-latest
+
+    steps:
+    # Step 1: Checks out your repository code so the workflow can access it
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    # Step 2: Sets up the Python environment on the runner
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.x' # Specifies to use the latest Python 3 version
+
+    # Step 3: Installs project dependencies from requirements.txt
+    # It first upgrades pip, then conditionally installs dependencies.
+    # The 'if [ -f requirements.txt ]' check ensures the step doesn't fail
+    # if requirements.txt is accidentally missing (though it should be present).
+    - name: Install dependencies
+      run: |
+        echo "Upgrading pip..."
+        python -m pip install --upgrade pip
+        
+        echo "Checking for requirements.txt..."
+        if [ -f requirements.txt ]; then
+          echo "requirements.txt found. Installing dependencies..."
+          pip install -r requirements.txt
+          echo "Dependencies installed successfully."
+        else
+          echo "No requirements.txt found. Skipping dependency installation."
+        fi
+
+    # Step 4: Runs unit tests using Python's unittest discovery
+    # This command looks for test files and runs any tests found.
+    # It's expected to find your tests in the 'tests/' directory.
+    - name: Run tests
+      run: |
+        echo "Running tests..."
+        python -m unittest discover tests/
+        echo "Tests run completed."
+
+    # Additional steps for CI/CD could go here, for example:
+    # - name: Build Docker Image
+    #   run: docker build -t my-app: latest.
+    # - name: Deploy to Staging
+    #   run: echo "Deploying to staging..."
