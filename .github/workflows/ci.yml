@@ -1,44 +1,14 @@
-name: Python CI/CD Pipeline
-
-on:
-  push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+name: CI Demo
+on: [push]
 
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
-
-    - name: Set up Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.x'
-
-    - name: Install dependencies
-      run: |
-        echo "Upgrading pip..."
-        python -m pip install --upgrade pip
-        
-        echo "Checking for requirements.txt..."
-        if [ -f requirements.txt ]; then
-          echo "requirements.txt found. Installing dependencies..."
-          pip install -r requirements.txt
-          echo "Dependencies installed successfully."
-        else
-          echo "No requirements.txt found. Skipping dependency installation."
-        fi
-
-    # *** THIS IS THE CORRECTED STEP ***
-    # Add the current working directory (repository root) to the PYTHONPATH
-    # before running tests. This allows tests/test_app.py to find app.py.
-    - name: Run tests
-      run: |
-        echo "Running tests..."
-        export PYTHONPATH=$PYTHONPATH:$(pwd) # Appends current directory to PYTHONPATH
-        python -m unittest discover tests/
-        echo "Tests run completed."
+      - uses: actions/checkout@v3
+      - name: Set up Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      - run: npm install
+      - run: npm test
